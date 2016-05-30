@@ -16,13 +16,25 @@ angular.module('angular-medium-editor', [])
     return {
       require: 'ngModel',
       restrict: 'AE',
-      scope: { bindOptions: '=' },
+      scope: {
+        bindOptions: '=',
+        mediumInsert: '='
+      },
       link: function(scope, iElement, iAttrs, ngModel) {
 
         angular.element(iElement).addClass('angular-medium-editor');
 
         // Global MediumEditor
         ngModel.editor = new MediumEditor(iElement, scope.bindOptions);
+
+        if (scope.mediumInsert) {
+          var addons = $.extend({embeds: false, images: false}, scope.mediumInsert);
+
+          iElement.mediumInsert({
+            editor: ngModel.editor,
+            addons: addons
+          });
+        }
 
         ngModel.$render = function() {
           iElement.html(ngModel.$viewValue || "");
@@ -43,7 +55,17 @@ angular.module('angular-medium-editor', [])
         };
 
         ngModel.editor.subscribe('editableInput', function (event, editable) {
-          ngModel.$setViewValue(editable.innerHTML.trim());
+          var value;
+
+          try {
+            var obj = ngModel.editor.serialize();
+            value = obj['element-0'].value;
+          }
+          catch (e) {
+            value = '';
+          }
+
+          ngModel.$setViewValue(value);
         });
 
         scope.$watch('bindOptions', function(bindOptions) {
