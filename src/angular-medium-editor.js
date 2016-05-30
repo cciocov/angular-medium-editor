@@ -28,11 +28,9 @@ angular.module('angular-medium-editor', [])
         ngModel.editor = new MediumEditor(iElement, scope.bindOptions);
 
         if (scope.mediumInsert) {
-          var addons = $.extend({embeds: false, images: false}, scope.mediumInsert);
-
           iElement.mediumInsert({
             editor: ngModel.editor,
-            addons: addons
+            addons: scope.mediumInsert
           });
         }
 
